@@ -27,15 +27,12 @@ ENV NODE_OPTIONS=--max-old-space-size=8192
 
 WORKDIR /usr/src/flowise
 
-# Copy app source
-COPY . .
+# Copy app source with correct ownership set during copy (avoids slow recursive chown)
+COPY --chown=node:node . .
 
 # Install dependencies and build (excluding sdk packages not needed for Docker)
 RUN pnpm install && \
     pnpm build:docker
-
-# Give the node user ownership of the application files
-RUN chown -R node:node .
 
 # Switch to non-root user (node user already exists in node:20-alpine)
 USER node
